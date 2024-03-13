@@ -9,15 +9,13 @@ import psycopg2
 
 # Read in the sample dataset for creating the SQL table schema
 df = pd.read_csv('yellow_head.csv')
+
 # Get schema and generate DDL statements for creating SQL tables of this df
 print(pd.io.sql.get_schema(df, name="yellow_taxi_data"))
 
-# Fix data types by parsing 2 columns into datetime
-df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
-df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
-
 # Create connection to postgres via SQLAlchemy
 engine = create_engine('postgresql://root:root@localhost:5432/ny_taxi')
+
 # Create the table via the connection using the DDL statements
 print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
 
