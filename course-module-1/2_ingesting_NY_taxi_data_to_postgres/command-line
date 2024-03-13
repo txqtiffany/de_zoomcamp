@@ -1,13 +1,54 @@
-## To spin up docker
+# CLI commands
 
-docker run -it \
-        -e POSTGRES_USER="root" \
-        -e POSTGRES_PASSWORD="root" \
-        -e POSTGRES_DB="ny_taxi" \
-        -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
-        -p 5432:5432 postgres:13
+## To spin up postgres in docker
+		# -e : setting enviromental variables
+        # -v : mapping local folder to docker container folder
+        # -p : define postgres reply port on host machine for sql answers
+
+    docker run -it \
+            -e POSTGRES_PASSWORD='root' \
+            -e POSTGRES_USER="root" \
+            -e POSTGRES_PASSWORD="root" \
+            -e POSTGRES_DB="ny_taxi" \
+            -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+            -p 5432:5432 postgres:13
 
 
 ## To access postgres using pgcli in another window
 
-pgcli -h localhost -p 5432 -u root -d ny_taxi
+    pgcli -h localhost -p 5432 -u root -d ny_taxi
+
+## To execute for logging into and running pgAdmin
+
+    docker run -it  \
+        -e PGADMIN_DEFAULT_EMAIL="admin@admin.com"  \
+        -e PGADMIN_DEFAULT_PASSWORD="root"  \
+        -p 8080:80    \
+        dpage/pgadmin4
+
+    - open [localhost:8080](http://localhost:8080) on a browser and log in with the email and password
+
+
+ ## To create a docker network
+    docker network create pg-network
+
+
+ ## To connect the postgres docker image to the network
+
+    docker run -it \
+                -e POSTGRES_PASSWORD='root'
+            -e POSTGRES_USER="root" \
+            -e POSTGRES_PASSWORD="root" \
+            -e POSTGRES_DB="ny_taxi" \
+            -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+            -p 5432:5432 postgres:13 \
+	        --network=pg-network \
+	        --name pgdatabase
+
+    docker run -it \
+            -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+            -e PGADMIN_DEFAULT_PASSWORD="root" \
+            -p 8080:80 \
+            --network=pg-network \
+            --name pgadmin-2 \
+            dpage/pgadmin4
